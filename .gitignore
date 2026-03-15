@@ -1,0 +1,11 @@
+.venv
+
+.env
+
+
+db.sqlite3
+
+
+accounts/__pycache__
+api/__pycache__
+JamieDate/__pycache__
