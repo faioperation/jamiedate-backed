@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework import permissions
 from debug_toolbar.toolbar import debug_toolbar_urls
 
-# from .views import api_root_view
+from .views import api_root_view
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
@@ -21,7 +21,7 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 urlpatterns = [
-    # path("", api_root_view),
+    path("", api_root_view),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("auth/", include("accounts.urls")),

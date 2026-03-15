@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Verify Your Account</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      /* Global Reset */
+      body,
+      table,
+      td,
+      p {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+      }
+      
+      body {
+        background-color: #1a1a1a;
+        color: #ccc;
+      }
+      
+      a {
+        color: #900616;
+        text-decoration: none;
+      }
+      
+      /* Responsive */
+      @media (max-width: 480px) {
+        .card {
+          width: 90% !important;
+        }
+      
+        .otp-code {
+          font-size: 28px !important;
+          letter-spacing: 6px !important;
+        }
+      
+        .header-title {
+          font-size: 22px !important;
+        }
+      
+        .body-text {
+          font-size: 14px !important;
+        }
+      
+        .note-text {
+          font-size: 13px !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Outer Wrapper -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center" style="padding: 30px 10px;">
+          <!-- Card -->
+          <table class="card" width="500" cellpadding="0" cellspacing="0" border="0" style="background: #1e1e1e; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.45);">
+            <!-- Header -->
+            <tr>
+              <td align="center" style="padding: 30px; background: linear-gradient(135deg,#222,#111);">
+                <span class="header-title" style="font-size: 26px; font-weight: 700; color: #AE1022;">Jamie-Date</span>
+              </td>
+            </tr>
+
+            <!-- Accent Line -->
+            <tr>
+              <td style="height: 4px; background-color: #900616;"></td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td style="padding: 35px; text-align: center; color: #ccc;">
+                <p class="body-text" style="margin-bottom:10px; font-size:15px; color: #ccc;">
+                  Dear <span class="font-weight:700">{{ name }}</span>,
+                </p>
+                <p class="body-text" style="margin-bottom:25px; font-size:15px; color: #ccc;">Your one-time password (OTP) is:</p>
+
+                <!-- OTP Box -->
+                <div class="otp-code" style="display:inline-block; padding:14px 30px; font-size:36px; font-weight:700; letter-spacing:8px; color:#900616; background:#111; border-radius:10px; border:1px solid #900616; margin-bottom:25px;">{{ OTP }}</div>
+
+                <p style="margin-bottom:15px; font-size:13px; color:#888;">
+                  ⏳ This code expires in <b>5 minutes</b>
+                </p>
+
+                <p class="note-text" style="font-size:14px; color:#aaa; line-height:1.7;">Please use this OTP to complete your login process. Do not share this code with anyone.</p>
+
+                <p class="note-text" style="font-size:13px; color:#777; margin-top:25px;">If you didn’t request this code, please ignore this email.</p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td align="center" style="padding: 20px; font-size:13px; color:#aaa;">© Jamie-Date. All rights reserved</td>
+            </tr>
+          </table>
+          <!-- End Card -->
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
