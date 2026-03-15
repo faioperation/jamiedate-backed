@@ -22,7 +22,9 @@ class SelfProfileView(APIView):
         tags=["Auth / Account"],
     )
     def get(self, request):
-        serializer = sz.SelfProfileSerializer(request.user)
+        serializer = sz.SelfProfileSerializer(
+            request.user, context={"request": request}
+        )
         return Response(serializer.data)
 
     @swagger_auto_schema(
@@ -33,7 +35,7 @@ class SelfProfileView(APIView):
     )
     def patch(self, request):
         serializer = sz.SelfProfileSerializer(
-            request.user, data=request.data, partial=True
+            request.user, data=request.data, partial=True, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -50,7 +52,9 @@ class UserListCreateView(APIView):
     )
     def get(self, request):
         users = User.objects.all().order_by("-id")
-        serializer = sz.UserManagementSerializer(users, many=True)
+        serializer = sz.UserManagementSerializer(
+            users, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
     @swagger_auto_schema(

@@ -11,7 +11,12 @@ from accounts.utils import (
 )
 
 
+from rest_framework import serializers
+
+
 class UserManagementSerializer(serializers.ModelSerializer):
+    profile_image = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -22,13 +27,22 @@ class UserManagementSerializer(serializers.ModelSerializer):
             "profile_image",
             "password",
         ]
-        read_only_fields = [
-            "id",
-        ]
+        read_only_fields = ["id"]
+
         extra_kwargs = {
             "password": {"write_only": True},
             "profile_image": {"required": False},
         }
+
+    def get_profile_image(self, obj):
+        request = self.context.get("request")
+
+        if obj.profile_image:
+            if request:
+                return request.build_absolute_uri(obj.profile_image.url)
+            return obj.profile_image.url
+
+        return None
 
     def create(self, validated_data):
         password = validated_data.pop("password", None)
@@ -40,6 +54,8 @@ class UserManagementSerializer(serializers.ModelSerializer):
 
 
 class SelfProfileSerializer(serializers.ModelSerializer):
+    profile_image = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -52,6 +68,14 @@ class SelfProfileSerializer(serializers.ModelSerializer):
             "role",
         ]
         read_only_fields = ["id", "email", "role"]
+
+    def get_profile_image(self, obj):
+        request = self.context.get("request")
+        if obj.profile_image:
+            if request:
+                return request.build_absolute_uri(obj.profile_image.url)
+            return obj.profile_image.url
+        return None
 
 
 class LoginSerializer(serializers.Serializer):

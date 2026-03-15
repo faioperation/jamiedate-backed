@@ -4,22 +4,28 @@ from conversation.models import PlatformUser, Message
 
 class MessageSerializer(serializers.ModelSerializer):
     timestamp_display = serializers.SerializerMethodField()
+    date_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
         fields = [
             "id",
+            "sender",
             "message_id",
             "text",
             "image_url",
             "timestamp",
             "timestamp_display",
+            "date_display",
             "is_from_bot",
         ]
         read_only_fields = ["id", "timestamp", "timestamp_display"]
 
     def get_timestamp_display(self, obj):
         return obj.timestamp.strftime("%I:%M %p")
+
+    def get_date_display(self, obj):
+        return obj.timestamp.strftime("%b %d, %Y")
 
 
 class PlatformUserSerializer(serializers.ModelSerializer):
@@ -37,17 +43,13 @@ class PlatformUserSerializer(serializers.ModelSerializer):
             "name",
             "display_name",
             "profile_pic",
-            # Bot state
             "current_state",
             "bot_attributes",
-            # Lead tracking
             "score",
             "status",
             "status_display",
-            # Timestamps
             "last_interaction",
             "last_interaction_display",
-            # Conversations
             "messages",
         ]
         read_only_fields = [

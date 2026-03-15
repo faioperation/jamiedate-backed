@@ -21,11 +21,8 @@ class PlatformUser(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     profile_pic = models.URLField(max_length=500, blank=True, null=True)
 
-    # Bot state
     current_state = models.CharField(max_length=100, default="ENTRY")
     bot_attributes = models.JSONField(default=dict, blank=True)
-
-    # Lead / engagement tracking
 
     score = models.IntegerField(
         default=0, help_text="Latest progress_score from bot (0–100)"
@@ -45,7 +42,7 @@ class PlatformUser(models.Model):
         verbose_name = "Sender"
         verbose_name_plural = "Senders"
 
-    # ── helpers ──────────────────────────────────────────────
+    # ── helpers
     @property
     def display_name(self):
         return self.name or f"User-{self.sender_id[-6:]}"

@@ -153,11 +153,20 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
     "http://localhost:5173",
     "http://localhost:5174",
     "https://charissa-intuitable-corroboratorily.ngrok-free.dev",
     "https://jamie-date-ai-setter.vercel.app",
 ]
+
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "ngrok-skip-browser-warning",
+]
+
 ALLOWED_HOSTS = [
     "172.252.13.97",
     "127.0.0.1",
@@ -166,6 +175,7 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
     "https://charissa-intuitable-corroboratorily.ngrok-free.dev",
     "https://jamie-date-ai-setter.vercel.app",
 ]
@@ -180,7 +190,9 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
 # Celery Configuration
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
-CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config(
+    "CELERY_RESULT_BACKEND", default="redis://localhost:6379/0"
+)
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
