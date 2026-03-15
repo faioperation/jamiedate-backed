@@ -23,6 +23,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     "api",
     "accounts",
     "conversation",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -69,6 +71,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "JamieDate.wsgi.application"
+ASGI_APPLICATION = "JamieDate.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -165,3 +177,20 @@ EMAIL_PORT = config("EMAIL_PORT")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+
+# Celery Configuration
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+
+# Meta Configuration (Facebook, Instagram, WhatsApp)
+FB_PAGE_ACCESS_TOKEN = config("FB_PAGE_ACCESS_TOKEN", default="")
+FB_VERIFY_TOKEN = config("FB_VERIFY_TOKEN", default="")
+FB_API_URL = config("FB_API_URL", default="https://graph.facebook.com/v21.0")
+IG_PAGE_ACCESS_TOKEN = config("IG_PAGE_ACCESS_TOKEN", default="")
+
+# Chatbot Server Configuration
+CHATBOT_URL = config("CHATBOT_URL", default="")
