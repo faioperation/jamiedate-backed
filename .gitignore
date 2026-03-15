@@ -9,3 +9,4 @@ db.sqlite3
 accounts/__pycache__
 api/__pycache__
 JamieDate/__pycache__
+conversation/__pycache__
