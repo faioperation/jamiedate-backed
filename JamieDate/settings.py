@@ -12,12 +12,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-w-43tt-thoud9dck5qu@dv-s!zn%9!%qbq2epe-rq^=)*)rc2o"
-
+SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 
 # Application definition
@@ -74,11 +71,17 @@ TEMPLATES = [
 WSGI_APPLICATION = "JamieDate.wsgi.application"
 ASGI_APPLICATION = "JamieDate.asgi.application"
 
+# Redis for Channels
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [
+                (
+                    config("REDIS_HOST", default="127.0.0.1"),
+                    config("REDIS_PORT", default=6379, cast=int),
+                )
+            ],
         },
     },
 }
@@ -153,14 +156,6 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://charissa-intuitable-corroboratorily.ngrok-free.dev",
-    "https://jamie-date-ai-setter.vercel.app",
-]
 
 from corsheaders.defaults import default_headers
 
@@ -168,18 +163,16 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     "ngrok-skip-browser-warning",
 ]
 
-ALLOWED_HOSTS = [
-    "172.252.13.97",
-    "127.0.0.1",
-    ".ngrok-free.dev",
-    "test11.fireai.agency",
-]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "https://charissa-intuitable-corroboratorily.ngrok-free.dev",
-    "https://jamie-date-ai-setter.vercel.app",
-]
+# ALLOWED_HOSTS
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1").split(",")
+
+# CORS
+CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="").split(",")
+
+# CSRF
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split(",")
+
 CORS_ALLOW_CREDENTIALS = True
 
 EMAIL_BACKEND = config("EMAIL_BACKEND")
@@ -190,9 +183,14 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
 # Celery Configuration
-CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+
+CELERY_BROKER_URL = config(
+    "CELERY_BROKER_URL",
+    default=f"redis://{config('REDIS_HOST')}:{config('REDIS_PORT')}/1",
+)
 CELERY_RESULT_BACKEND = config(
-    "CELERY_RESULT_BACKEND", default="redis://localhost:6379/0"
+    "CELERY_RESULT_BACKEND",
+    default=f"redis://{config('REDIS_HOST')}:{config('REDIS_PORT')}/1",
 )
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"

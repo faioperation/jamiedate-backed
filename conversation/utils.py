@@ -52,7 +52,7 @@ def send_fb_message(user, text):
 
     try:
         res = requests.post(url, headers=headers, json=payload)
-        print(f"{user.platform.upper()} Send Status: {res.status_code}")
+        # print(f"{user.platform.upper()} Send Status: {res.status_code}")
         if res.status_code == 200 or res.status_code == 201:
             try:
                 data = res.json()
@@ -96,11 +96,11 @@ def fetch_user_info(user):
             "access_token": token,
         }
 
-    print(f"--- Fetching Info for: {user.sender_id} ---")
+    # print(f"--- Fetching Info for: {user.sender_id} ---")
 
     try:
         response = requests.get(url, params=params, timeout=10)
-        print(f"Graph API Status (Combined): {response.status_code}")
+        # print(f"Graph API Status (Combined): {response.status_code}")
 
         if response.status_code == 200:
             data = response.json()
@@ -111,7 +111,7 @@ def fetch_user_info(user):
         print("Combined fetch failed, trying first_name and last_name only...")
         params["fields"] = "first_name,last_name"
         response = requests.get(url, params=params, timeout=10)
-        print(f"Graph API Status (Granular): {response.status_code}")
+        # print(f"Graph API Status (Granular): {response.status_code}")
 
         if response.status_code == 200:
             data = response.json()
@@ -152,5 +152,27 @@ def update_user_data(user, data):
     elif "profile_picture_url" in data:
         user.profile_pic = data.get("profile_picture_url")
 
-    user.save()
-    print(f"User info updated: {user.name}")
+
+def broadcast_message(message_obj):
+    """
+    Broadcasts a message to the dashboard WebSocket group.
+    """
+    try:
+        from asgiref.sync import async_to_sync
+        from channels.layers import get_channel_layer
+        from conversation.serializers import MessageSerializer
+
+        channel_layer = get_channel_layer()
+        serialized_msg = MessageSerializer(message_obj).data
+
+        async_to_sync(channel_layer.group_send)(
+            "dashboard_messages",
+            {
+                "type": "chat_message",
+                "message": serialized_msg,
+                "user_id": message_obj.sender.id,
+            },
+        )
+        # print(f"Broadcasted message: {message_obj.id}")
+    except Exception as e:
+        print(f"Error broadcasting message: {e}")

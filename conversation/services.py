@@ -40,19 +40,18 @@ def process_messaging_event(
                 msg.save()
             return
 
-        print(
-            f"Processing {platform.upper()} Event from {sender_id}. Text: '{message_text}' (len: {len(message_text) if message_text else 0})"
-        )
+        # print(
+        #     f"Processing {platform.upper()} Event from {sender_id}. Text: '{message_text}' (len: {len(message_text) if message_text else 0})"
+        # )
 
         # Fetch name if missing
         if not user.name:
             fetch_user_info(user)
 
         # Real-time dashboard update
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "dashboard_messages", {"type": "chat_message"}
-        )
+        from conversation.utils import broadcast_message
+
+        broadcast_message(msg)
 
         # Reply only if it's NOT from bot/echo
         if not is_from_bot:

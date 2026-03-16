@@ -46,10 +46,9 @@ class PlatformUserViewSet(viewsets.ModelViewSet):
         send_fb_message_task.delay(user.sender_id, text, msg.id)
 
         # Real-time dashboard update
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "dashboard_messages", {"type": "chat_message"}
-        )
+        from conversation.utils import broadcast_message
+
+        broadcast_message(msg)
 
         return Response(MessageSerializer(msg).data, status=status.HTTP_201_CREATED)
 
@@ -68,29 +67,29 @@ class MessageViewSet(viewsets.ReadOnlyModelViewSet):
 
 @csrf_exempt
 def webhook(request):
-    print(f"Webhook called: {request.method}")
+    # print(f"Webhook called: {request.method}")
     if request.method == "GET":
         # Facebook webhook verification
         verify_token = settings.FB_VERIFY_TOKEN
-        print(f"GET Params: {request.GET}")
+        # print(f"GET Params: {request.GET}")
         mode = request.GET.get("hub.mode")
         token = request.GET.get("hub.verify_token")
         challenge = request.GET.get("hub.challenge")
 
         if mode == "subscribe" and token == verify_token:
-            print("Verification Successful!")
+            # print("Verification Successful!")
             return HttpResponse(challenge)
-        print("Verification Failed!")
+        # print("Verification Failed!")
         return HttpResponse("Invalid verification token", status=403)
 
     elif request.method == "POST":
         data = json.loads(request.body.decode("utf-8"))
 
         # 1. Print full JSON data for debugging
-        print("-" * 50)
-        print(f"WEBHOOK RECEIVED AT {request.path}")
-        print(json.dumps(data, indent=2))
-        print("-" * 50)
+        # print("-" * 50)
+        # print(f"WEBHOOK RECEIVED AT {request.path}")
+        # print(json.dumps(data, indent=2))
+        # print("-" * 50)
 
         if data.get("object") in ["page", "instagram", "whatsapp_business_account"]:
             platform = "facebook"
@@ -243,10 +242,9 @@ def api_send_reply(request):
         user.last_interaction = msg.timestamp
         user.save()
 
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            "dashboard_messages", {"type": "chat_message"}
-        )
+        from conversation.utils import broadcast_message
+
+        broadcast_message(msg)
 
         # Use Celery for Background Task
         from conversation.tasks import send_fb_message_task

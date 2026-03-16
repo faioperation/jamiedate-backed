@@ -37,7 +37,7 @@ def call_chatbot_task(sender_id, user_text, incoming_msg_id):
     """
     Background task to call the chatbot server and handle the reply.
     """
-    print(f"\n[BOT] Starting chatbot task for sender: {sender_id}")
+    # print(f"\n[BOT] Starting chatbot task for sender: {sender_id}")
     try:
         user = PlatformUser.objects.get(sender_id=sender_id)
 
@@ -54,19 +54,19 @@ def call_chatbot_task(sender_id, user_text, incoming_msg_id):
             print("[BOT] CHATBOT_URL not configured in settings")
             return
 
-        print(f"[BOT] Calling Chatbot URL: {chatbot_url}")
-        print(f"[BOT] Payload: {json.dumps(payload, indent=2)}")
+        # print(f"[BOT] Calling Chatbot URL: {chatbot_url}")
+        # print(f"[BOT] Payload: {json.dumps(payload, indent=2)}")
 
         try:
             response = requests.post(chatbot_url, json=payload, timeout=30)
-            print(f"[BOT] Response Status: {response.status_code}")
+            # print(f"[BOT] Response Status: {response.status_code}")
         except requests.exceptions.RequestException as e:
             print(f"[BOT] Connection Error: {e}")
             return
 
         if response.status_code == 200:
             data = response.json()
-            print(f"[BOT] Data Received: {json.dumps(data, indent=2)}")
+            # print(f"[BOT] Data Received: {json.dumps(data, indent=2)}")
             reply_text = data.get("reply")
             next_state = data.get("next_state")
             extracted_attrs = data.get("extracted_attributes", {})
@@ -79,7 +79,7 @@ def call_chatbot_task(sender_id, user_text, incoming_msg_id):
                     is_from_bot=True,
                     message_id=f"bot_pending_{int(time.time())}",
                 )
-                print(f"[BOT] Bot reply saved: {bot_msg.id}")
+                # print(f"[BOT] Bot reply saved: {bot_msg.id}")
 
                 if next_state:
                     user.current_state = next_state
@@ -90,14 +90,13 @@ def call_chatbot_task(sender_id, user_text, incoming_msg_id):
                 user.update_score_and_status(progress_score)
                 user.save()
 
-                print("[BOT] Sending WebSocket update signal")
-                channel_layer = get_channel_layer()
-                async_to_sync(channel_layer.group_send)(
-                    "dashboard_messages", {"type": "chat_message"}
-                )
-                print(
-                    f"[BOT] Triggering send_fb_message_task for: {reply_text[:20]}..."
-                )
+                # print("[BOT] Sending WebSocket update signal")
+                from conversation.utils import broadcast_message
+
+                broadcast_message(bot_msg)
+                # print(
+                #     f"[BOT] Triggering send_fb_message_task for: {reply_text[:20]}..."
+                # )
                 send_fb_message_task.delay(user.sender_id, reply_text, bot_msg.id)
             else:
                 print("[BOT] No reply_text found in API response")

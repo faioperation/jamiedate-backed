@@ -24,5 +24,7 @@ class DashboardConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            "type": "update"
+            "type": "update",
+            "message": event.get("message"),
+            "user_id": event.get("user_id"),
         }))
