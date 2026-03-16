@@ -31,11 +31,20 @@ class LeadsSerializer(serializers.ModelSerializer):
         return None
 
 
-from rest_framework import serializers
-
-
 class LeadsAnalyticsSerializer(serializers.Serializer):
     total_leads = serializers.IntegerField()
     hot_leads = serializers.IntegerField()
     hot_lead_rate = serializers.FloatField()
     average_score = serializers.FloatField()
+
+
+class DashbaordSummarySerializer(serializers.Serializer):
+    total_user_messages = serializers.IntegerField()
+    potential_leads = serializers.IntegerField()
+    conversation_rate = serializers.FloatField()
+    average_messages_per_user = serializers.FloatField()
+
+
+class MessageGraphSerializer(serializers.Serializer):
+    day = serializers.CharField()
+    total_messages = serializers.IntegerField()
