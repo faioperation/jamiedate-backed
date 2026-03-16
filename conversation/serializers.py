@@ -44,7 +44,7 @@ class PlatformUserSerializer(serializers.ModelSerializer):
             "display_name",
             "profile_pic",
             "current_state",
-            "bot_attributes",
+            # "bot_attributes",
             "score",
             "status",
             "status_display",

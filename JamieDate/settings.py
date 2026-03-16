@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "api",
     "accounts",
     "conversation",
+    "leads",
     "channels",
 ]
 
