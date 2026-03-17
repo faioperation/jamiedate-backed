@@ -10,11 +10,14 @@ def process_messaging_event(
     """
     Core logic to handle incoming message events from various platforms.
     """
+    print(f"\n[SERVICE] Processing {platform.upper()} Event from {sender_id}. Text: '{message_text}'")
     try:
         # Get or create user
         user, created = PlatformUser.objects.get_or_create(
             sender_id=sender_id, defaults={"platform": platform}
         )
+        if created:
+            print(f"[SERVICE] Created new user: {sender_id}")
 
         # Always update last_interaction
         user.save()
@@ -31,6 +34,7 @@ def process_messaging_event(
         )
 
         if not msg_created:
+            print(f"[SERVICE] Message {message_id} already exists. Skipping.")
             # If it's an echo and we found an existing message without a real ID, update it
             if is_from_bot and (
                 not msg.message_id
@@ -40,24 +44,25 @@ def process_messaging_event(
                 msg.save()
             return
 
-        # print(
-        #     f"Processing {platform.upper()} Event from {sender_id}. Text: '{message_text}' (len: {len(message_text) if message_text else 0})"
-        # )
+        print(f"[SERVICE] Message successfully saved with ID: {msg.id}")
 
         # Fetch name if missing
         if not user.name:
+            print(f"[SERVICE] User name missing. Fetching from Meta API...")
             fetch_user_info(user)
 
         # Real-time dashboard update
         from conversation.utils import broadcast_message
-
+        print(f"[SERVICE] Broadcasting message to discovery group via WebSocket")
         broadcast_message(msg)
 
         # Reply only if it's NOT from bot/echo
         if not is_from_bot:
             from conversation.tasks import call_chatbot_task
-
+            print(f"[SERVICE] Queueing 'call_chatbot_task' for {user.sender_id}")
             call_chatbot_task.delay(user.sender_id, message_text, msg.id)
+        else:
+            print("[SERVICE] Message is from bot or echo. Skipping chatbot call.")
 
     except Exception as e:
-        print(f"Error in process_messaging_event: {e}")
+        print(f"[SERVICE] CRITICAL ERROR in process_messaging_event: {e}")
