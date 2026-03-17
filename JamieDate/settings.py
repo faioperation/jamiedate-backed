@@ -166,17 +166,17 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 
 
 # ALLOWED_HOSTS
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1").split(",")
+ALLOWED_HOSTS = [h.strip() for h in config("ALLOWED_HOSTS", default="127.0.0.1").split(",")]
 
 # CORS
-CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="").split(",")
+CORS_ALLOWED_ORIGINS = [o.strip() for o in config("CORS_ALLOWED_ORIGINS", default="").split(",") if o.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
 
 # HTTPS/SSL Settings for VPS
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Automatically add allowed hosts to trusted origins for CSRF
-CSRF_TRUSTED_ORIGINS = [f"https://{host.strip()}" for host in ALLOWED_HOSTS if host.strip()]
+CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host]
 # Add localhost if not already there
 if "http://127.0.0.1:8000" not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append("http://127.0.0.1:8000")

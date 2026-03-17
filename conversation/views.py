@@ -67,11 +67,11 @@ class MessageViewSet(viewsets.ReadOnlyModelViewSet):
 
 @csrf_exempt
 def webhook(request):
-    # print(f"Webhook called: {request.method}")
+    print(f"\n[WEBHOOK] {request.method} request received at {request.path}")
     if request.method == "GET":
         # Facebook webhook verification
         verify_token = settings.FB_VERIFY_TOKEN
-        # print(f"GET Params: {request.GET}")
+        print(f"[WEBHOOK] GET Params: {request.GET}")
         mode = request.GET.get("hub.mode")
         token = request.GET.get("hub.verify_token")
         challenge = request.GET.get("hub.challenge")
