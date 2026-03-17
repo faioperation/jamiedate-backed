@@ -166,22 +166,31 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 
 
 # ALLOWED_HOSTS
-ALLOWED_HOSTS = [h.strip() for h in config("ALLOWED_HOSTS", default="127.0.0.1").split(",")]
+env_allowed_hosts = config("ALLOWED_HOSTS", default="127.0.0.1").split(",")
+ALLOWED_HOSTS = [h.strip() for h in env_allowed_hosts if h.strip()]
 
 # CORS
 CORS_ALLOWED_ORIGINS = [o.strip() for o in config("CORS_ALLOWED_ORIGINS", default="").split(",") if o.strip()]
-
 CORS_ALLOW_CREDENTIALS = True
 
 # HTTPS/SSL Settings for VPS
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# Automatically add allowed hosts to trusted origins for CSRF
-CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host]
-# Add localhost if not already there
-if "http://127.0.0.1:8000" not in CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS.append("http://127.0.0.1:8000")
-if "http://localhost:8000" not in CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS.append("http://localhost:8000")
+
+# CSRF Trusted Origins - Combine from .env and ALLOWED_HOSTS
+env_csrf_origins = config("CSRF_TRUSTED_ORIGINS", default="").split(",")
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in env_csrf_origins if o.strip()]
+
+# Add https versions of ALLOWED_HOSTS to CSRF_TRUSTED_ORIGINS
+for host in ALLOWED_HOSTS:
+    if host and not host.startswith(("http://", "https://")):
+        https_origin = f"https://{host}"
+        if https_origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(https_origin)
+
+# Ensure common development origins are present
+for entry in ["http://127.0.0.1:8000", "http://localhost:8000"]:
+    if entry not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(entry)
 
 EMAIL_BACKEND = config("EMAIL_BACKEND")
 EMAIL_HOST = config("EMAIL_HOST")
